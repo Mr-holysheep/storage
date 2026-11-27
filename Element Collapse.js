@@ -4,13 +4,11 @@
 // @version      1.0
 // @description  Collapse specified elements on mouse click and provide a toggle to expand/collapse
 // @author       You
-// @match        *://*/*
+// @match        http*://*/*
 // @grant        GM_registerMenuCommand
 // @run-at       document-body
+// @noframes
 // ==/UserScript==
-
-//patch note:
-//		ec-dom_path
 
 (function() {
 
