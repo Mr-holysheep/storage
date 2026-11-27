@@ -744,7 +744,7 @@
 
         if (ecGlobalBarRemovalCount >= 5) {
             ecGlobalBarRecreationDisabled = true;
-            console.warn('[Element Collapse] UJS 的 Global Bar 已被移除 5 次，停止重新插入。');
+            console.warn('[Element Collapse] Element Collapse 的 Global Bar 已被移除 5 次，停止重新插入。');
             return;
         }
 
