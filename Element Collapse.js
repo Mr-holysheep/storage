@@ -102,11 +102,11 @@
     let global_bar_style = `
             :host {
                 position: fixed;
-                top: -1000px;
+                top: 5px;
                 left: 5px;
                 z-index: 2147483647;
 
-                display: block;
+                display: none;
 
                 box-sizing: border-box;
                 padding: 5px;
@@ -119,12 +119,10 @@
                 font: 15px/15px system-ui, sans-serif;
 
                 user-select: none;
-
-                transition: top 0.3s ease-in-out;
             }
 
             :host(.ec-visible) {
-                top: 5px;
+                display: block;
             }
 
             .ec-global-button {
