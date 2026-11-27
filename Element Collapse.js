@@ -102,7 +102,7 @@
                 position: fixed;
                 top: 5px;
                 left: 5px;
-                z-index: 2147483647;
+                z-index: 2147483647 !important;
 
                 display: none;
 
@@ -729,6 +729,12 @@
 
     let ecGlobalBar = createGlobalBar();
 
+    function ensureGlobalBar() {
+        if (!ecGlobalBar || !ecGlobalBar.isConnected) {
+            ecGlobalBar = createGlobalBar();
+        }
+    }
+
     function showGlobalBar() {
 
         ecGlobalBar.classList.add(
@@ -1286,6 +1292,8 @@
     // ---------- Observer ----------
 
     let ecObserver = new MutationObserver(() => {
+
+        ensureGlobalBar();
 
         if (ecApplying) {
             return;
