@@ -728,11 +728,27 @@
     }
 
     let ecGlobalBar = createGlobalBar();
+    let ecGlobalBarRemovalCount = 0;
+    let ecGlobalBarRecreationDisabled = false;
 
     function ensureGlobalBar() {
-        if (!ecGlobalBar || !ecGlobalBar.isConnected) {
-            ecGlobalBar = createGlobalBar();
+        if (ecGlobalBar && ecGlobalBar.isConnected) {
+            return;
         }
+
+        if (ecGlobalBarRecreationDisabled) {
+            return;
+        }
+
+        ecGlobalBarRemovalCount++;
+
+        if (ecGlobalBarRemovalCount >= 5) {
+            ecGlobalBarRecreationDisabled = true;
+            console.warn('[Element Collapse] UJS 的 Global Bar 已被移除 5 次，停止重新插入。');
+            return;
+        }
+
+        ecGlobalBar = createGlobalBar();
     }
 
     function showGlobalBar() {
