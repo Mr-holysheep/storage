@@ -6,6 +6,10 @@ Telegram Web K 左側聊天清單優化原型。
 
 第一個原型只驗證一件事：**阻止既有聊天項目因一般對話更新而重新排序，同時保留訊息預覽與未讀狀態更新。**
 
+### 安裝
+
+使用 Tampermonkey 或 Violentmonkey，開啟 [TeleTether.user.js](https://raw.githubusercontent.com/Mr-holysheep/storage/main/TeleTether/TeleTether.user.js) 安裝，然後重新載入 Telegram Web K。
+
 ### 目前做法
 
 利用 Telegram Web K 公開在頁面環境中的 `appDialogsManager`，接上各個 `AutonomousDialogList`：
@@ -15,9 +19,7 @@ Telegram Web K 左側聊天清單優化原型。
 3. Telegram 原本的 `setLastMessageN()` 仍照常執行，因此訊息預覽與未讀更新不應受影響。
 4. 新增、刪除聊天項目及其他不經這條呼叫路徑的操作，暫時不主動攔截。
 
-### 安裝與操作
-
-使用 Tampermonkey 或 Violentmonkey，安裝 `TeleTether.user.js`，然後重新載入 Telegram Web K。
+### 操作
 
 透過使用者腳本管理器的腳本選單操作：
 
