@@ -9,7 +9,7 @@ Telegram Web K 左側聊天清單優化原型。
 0.1.2 增加針對這條流程的診斷，記錄：
 
 - 每個清單的 `listId` 與 `filterId`。
-- `updateDialog()`、`addOrDeleteDialogIfNeeded())、`canUpdateDialog()) 的呼叫。
+- `updateDialog()`、`addOrDeleteDialogIfNeeded()`、`canUpdateDialog()` 的呼叫。
 - `canUpdateDialog()` 判斷時的 dialogIndex、目前已載入清單的 bottomIndex、loadedItemCount、hasReachedTheEnd 及判斷結果。
 - `SortedDialogList.add()` / `delete()` 的呼叫端堆疊。
 - `getIndexForKey()` 最終取得的排序索引。
@@ -53,7 +53,7 @@ TeleTether.restore();
 優先觀察：
 
 - 同一個 `peerId` 是否在同一個 `listId/filterId` 被移除後重新加入。
-- `canUpdateDialog` 的 `dialogIndex) 是否小於 `bottomIndex)，以及當時的 `hasReachedTheEnd)。
+- `canUpdateDialog()` 的 `dialogIndex` 是否小於 `bottomIndex`，以及當時的 `hasReachedTheEnd`。
 - `SortedDialogList.add()` 的呼叫端堆疊，確認重新加入來自哪個更新事件。
 - 同一個 ID 的重複加入是否其實發生於不同資料夾清單。
 
