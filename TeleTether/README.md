@@ -2,24 +2,23 @@
 
 Telegram Web K 左側聊天清單優化原型。
 
-## 目前版本：0.1.1
+## 目前版本：0.1.2
 
-第一個原型已驗證：常見的 `updateDialog() → sortedList.update()` 排序更新可被攔截，同時保留最後訊息預覽與未讀狀態更新。
+0.1.1 診斷顯示：清單移動時，Telegram 會經由 `AutonomousDialogListBase.updateDialog()` → `addOrDeleteDialogIfNeeded()` → `deleteDialog()` 移除聊天項目，之後又經由 `SortedDialogList.add()` 重新加入。每次刪除的 `removePinnedItem()` 與 `removeItem()` 是 `SortedDialogList.delete()` 同時檢查置頂／一般集合的正常行為。
 
-0.1.1 在不擴大攔截範圍的前提下，加入虛擬清單變更診斷，用來定位仍會造成項目移動的其他路徑。
+0.1.2 增加針對這條流程的診斷，記錄：
+
+- 每個清單的 `listId` 與 `filterId`。
+- `updateDialog()`、`addOrDeleteDialogIfNeeded())、`canUpdateDialog()) 的呼叫。
+- `canUpdateDialog()` 判斷時的 dialogIndex、目前已載入清單的 bottomIndex、loadedItemCount、hasReachedTheEnd 及判斷結果。
+- `SortedDialogList.add()` / `delete()` 的呼叫端堆疊。
+- `getIndexForKey()` 最終取得的排序索引。
+
+本版本不增加新的攔截範圍，診斷紀錄也不會阻止新增／刪除操作。
 
 ## 安裝／更新
 
 使用 Tampermonkey 或 Violentmonkey，開啟 [TeleTether.user.js](https://raw.githubusercontent.com/Mr-holysheep/storage/main/TeleTether/TeleTether.user.js) 安裝或更新，然後重新載入 Telegram Web K。
-
-## 排序凍結的目前做法
-
-利用 Telegram Web K 公開在頁面環境中的 `appDialogsManager`，接上各個 `AutonomousDialogList`：
-
-1. 包裝 `AutonomousDialogListBase.updateDialog()`。
-2. 當這個方法呼叫 `SortedDialogList.update()` 時，若排序凍結已啟用，就略過這次索引更新。
-3. Telegram 原本的 `setLastMessageN()` 仍照常執行，因此訊息預覽與未讀更新不受這項攔截影響。
-4. 其他新增、刪除、置頂及清單重建操作仍交由 Telegram 處理。
 
 ## 操作
 
@@ -27,8 +26,8 @@ Telegram Web K 左側聊天清單優化原型。
 
 - **切換排序凍結**：開啟／關閉原型功能。
 - **查看狀態**：顯示連線、接管清單數及攔截次數。
-- **開始更新路徑診斷**：開始記錄凍結期間的虛擬清單變更。
-- **輸出診斷報告**：停止收集並在主控台輸出變更方法、項目 ID／索引與呼叫堆疊。
+- **開始更新路徑診斷**：開始記錄凍結期間的內部清單操作。
+- **輸出診斷報告**：停止收集並在主控台輸出方法、清單識別、索引判斷值與呼叫堆疊。
 - **撤銷攔截**：還原本次注入的函式包裝。
 
 也可以在 Telegram 頁面的開發者主控台使用：
@@ -37,39 +36,28 @@ Telegram Web K 左側聊天清單優化原型。
 TeleTether.freeze();
 TeleTether.unfreeze();
 TeleTether.status();
-
-// 啟動診斷後，再重現聊天項目移動
 TeleTether.diagnostics(true);
-
-// 重現完成後輸出報告
 TeleTether.diagnostics(false);
-
-// 或直接查看目前報告
 TeleTether.report();
+TeleTether.restore();
 ```
-
-診斷只會在「凍結已啟用」時記錄以下虛擬清單變更：
-
-- `updateItem`：修改既有項目的排序索引。
-- `addItems`：加入一般項目。
-- `addPinnedItems`／`ensurePinnedItems`：加入或確認置頂項目。
-- `removeItem`／`removePinnedItem`：移除項目。
-- `clear`：清空清單。
-
-每筆紀錄包含呼叫堆疊，最多保留最近 150 筆。診斷本身不會阻止這些操作。
 
 ## 測試方式
 
 1. 更新腳本並重新載入 Telegram Web K。
 2. 啟用「排序凍結」。
 3. 在主控台執行 `TeleTether.diagnostics(true)`。
-4. 讓原本已存在的群組收到訊息，重現清單移動。
-5. 執行 `TeleTether.diagnostics(false)`，查看輸出報告。
-6. 同時確認最後訊息預覽與未讀數仍有正常更新。
+4. 讓原本會造成聊天項目移動的情況再發生。
+5. 執行 `TeleTether.diagnostics(false)`，查看報告。
 
-若項目移動時出現 `updateItem`，呼叫堆疊可協助定位索引更新來源；若出現 `addItems`、置頂項目操作或 `clear`，則應先判斷是否為新項目、置頂或清單重建造成的正常位置變動。
+優先觀察：
 
-目前尚未在使用者的 Telegram 帳號上實測 0.1.1。診斷只監看虛擬清單公開的變更方法，若原生程式直接透過其他內部狀態改動排序，仍需另外追查。
+- 同一個 `peerId` 是否在同一個 `listId/filterId` 被移除後重新加入。
+- `canUpdateDialog` 的 `dialogIndex) 是否小於 `bottomIndex)，以及當時的 `hasReachedTheEnd)。
+- `SortedDialogList.add()` 的呼叫端堆疊，確認重新加入來自哪個更新事件。
+- 同一個 ID 的重複加入是否其實發生於不同資料夾清單。
+
+目前尚未在使用者的 Telegram 帳號上實測 0.1.2。診斷資料最多保留 200 筆，且只在排序凍結與診斷同時啟用時收集。
 
 ## Telegram Web K 原始碼參考
 
