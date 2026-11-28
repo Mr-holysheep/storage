@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TeleTether
 // @namespace    https://github.com/Mr-holysheep/storage
-// @version      0.1.1
+// @version      0.1.2
 // @description  Telegram Web K 聊天清單排序凍結與更新路徑診斷
 // @match        https://web.telegram.org/k/*
 // @run-at       document-idle
@@ -14,7 +14,7 @@
 (function() {
   'use strict';
 
-  let VERSION = '0.1.1';
+  let VERSION = '0.1.2';
   let page = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
   let freezeEnabled = false;
   let diagnosticsEnabled = false;
@@ -22,6 +22,7 @@
   let suppressedSortUpdates = 0;
   let patchedListCount = 0;
   let patchedVirtualListCount = 0;
+  let nextListId = 1;
   let patches = [];
   let diagnosticEvents = [];
   let diagnosticCounts = Object.create(null);
@@ -48,7 +49,7 @@
     return result.join(', ');
   }
 
-  function recordMutation(operation, detail) {
+  function recordMutation(operation, detail, state, stackOffset) {
     if (!diagnosticsEnabled || !freezeEnabled) {
       return;
     }
@@ -57,20 +58,27 @@
     let event = {
       number: diagnosticEvents.length + 1,
       time: new Date().toLocaleTimeString(),
+      listId: state ? state.listId : null,
+      filterId: state ? state.filterId : null,
       operation: operation,
       detail: detail,
-      stack: stack.split('\n').slice(2, 12).join('\n')
+      stack: stack.split('\n').slice(stackOffset || 2, (stackOffset || 2) + 12).join('\n')
     };
 
     diagnosticEvents.push(event);
-    if (diagnosticEvents.length > 150) {
+    if (diagnosticEvents.length > 200) {
       diagnosticEvents.shift();
     }
 
     diagnosticCounts[operation] = (diagnosticCounts[operation] || 0) + 1;
   }
 
-  function observeVirtualMethod(virtualList, key, operation, describe) {
+  function addPatch(target, key, original, wrapped) {
+    target[key] = wrapped;
+    patches.push({target: target, key: key, original: original, wrapped: wrapped});
+  }
+
+  function observeVirtualMethod(virtualList, key, operation, describe, state) {
     let original = virtualList[key];
     if (typeof original !== 'function' || original.__teleTetherObserved) {
       return;
@@ -78,17 +86,121 @@
 
     let wrapped = function() {
       if (diagnosticsEnabled && freezeEnabled) {
-        recordMutation(operation, describe(arguments));
+        recordMutation(operation, describe(arguments), state, 3);
       }
       return original.apply(this, arguments);
     };
 
     wrapped.__teleTetherObserved = true;
-    virtualList[key] = wrapped;
-    patches.push({target: virtualList, key: key, original: original, wrapped: wrapped});
+    addPatch(virtualList, key, original, wrapped);
   }
 
-  function patchVirtualList(xd) {
+  function getDialogSnapshot(dialog, xd, state) {
+    if (!dialog || typeof dialog !== 'object') {
+      return String(dialog);
+    }
+
+    let sortedItems = xd.sortedList.getSortedItems();
+    let last = sortedItems[sortedItems.length - 1];
+    let indexKey = xd.indexKey;
+    return {
+      peerId: dialog.peerId,
+      indexKey: indexKey,
+      dialogIndex: indexKey ? dialog[indexKey] : undefined,
+      bottomIndex: last ? last.index : undefined,
+      loadedItemCount: sortedItems.length,
+      hasReachedTheEnd: xd.hasReachedTheEnd,
+      filterId: state.filterId,
+      listId: state.listId
+    };
+  }
+
+  function patchDialogListMethods(xd, state) {
+    let methods = [
+      {
+        key: 'updateDialog',
+        operation: 'list.updateDialog',
+        before: function(args) { return getDialogSnapshot(args[0], xd, state); }
+      },
+      {
+        key: 'addOrDeleteDialogIfNeeded',
+        operation: 'list.addOrDeleteDialogIfNeeded',
+        before: function(args) { return getDialogSnapshot(args[0], xd, state); }
+      },
+      {
+        key: 'canUpdateDialog',
+        operation: 'list.canUpdateDialog',
+        before: function(args) { return getDialogSnapshot(args[0], xd, state); }
+      }
+    ];
+
+    for (let i = 0; i < methods.length; i++) {
+      let item = methods[i];
+      let original = xd[item.key];
+      if (typeof original !== 'function' || original.__teleTetherObserved) {
+        continue;
+      }
+
+      let wrapped = function() {
+        let detail = diagnosticsEnabled && freezeEnabled ? item.before(arguments) : null;
+        let result = original.apply(this, arguments);
+        if (diagnosticsEnabled && freezeEnabled) {
+          if (item.key === 'canUpdateDialog') {
+            detail.result = result;
+          } else if (item.key === 'addOrDeleteDialogIfNeeded') {
+            detail.result = result;
+          }
+          recordMutation(item.operation, detail, state, 3);
+        }
+        return result;
+      };
+
+      wrapped.__teleTetherObserved = true;
+      addPatch(xd, item.key, original, wrapped);
+    }
+  }
+
+  function patchSortedListMethods(sortedList, state) {
+    let methods = ['add', 'delete'];
+    for (let i = 0; i < methods.length; i++) {
+      let key = methods[i];
+      let original = sortedList[key];
+      if (typeof original !== 'function' || original.__teleTetherObserved) {
+        continue;
+      }
+
+      let wrapped = function() {
+        if (diagnosticsEnabled && freezeEnabled) {
+          recordMutation('sortedList.' + key, summarizeItems([{id: arguments[0]}]), state, 3);
+        }
+        return original.apply(this, arguments);
+      };
+
+      wrapped.__teleTetherObserved = true;
+      addPatch(sortedList, key, original, wrapped);
+    }
+
+    let originalGetIndex = sortedList.getIndexForKey;
+    if (typeof originalGetIndex === 'function' && !originalGetIndex.__teleTetherObserved) {
+      let wrappedGetIndex = function() {
+        let key = arguments[0];
+        let result = originalGetIndex.apply(this, arguments);
+        if (result && typeof result.then === 'function') {
+          return result.then(function(index) {
+            recordMutation('sortedList.getIndexForKey:resolved', String(key) + ' -> ' + String(index), state, 3);
+            return index;
+          });
+        }
+        recordMutation('sortedList.getIndexForKey', String(key) + ' -> ' + String(result), state, 3);
+        return result;
+      };
+
+      wrappedGetIndex.__teleTetherObserved = true;
+      addPatch(sortedList, 'getIndexForKey', originalGetIndex, wrappedGetIndex);
+    }
+  }
+
+  function patchVirtualList(xd, state) {
     let virtualList = xd.sortedList.virtualList;
     if (!virtualList || typeof virtualList.updateItem !== 'function') {
       return false;
@@ -96,32 +208,32 @@
 
     observeVirtualMethod(virtualList, 'updateItem', 'virtualList.updateItem', function(args) {
       return String(args[0]) + ' -> index ' + String(args[1]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'addItems', 'virtualList.addItems', function(args) {
       return summarizeItems(args[0]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'addPinnedItems', 'virtualList.addPinnedItems', function(args) {
       return summarizeItems(args[0]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'ensurePinnedItems', 'virtualList.ensurePinnedItems', function(args) {
       return summarizeItems(args[0]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'removeItem', 'virtualList.removeItem', function(args) {
       return String(args[0]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'removePinnedItem', 'virtualList.removePinnedItem', function(args) {
       return String(args[0]);
-    });
+    }, state);
     observeVirtualMethod(virtualList, 'clear', 'virtualList.clear', function() {
       return 'clear all items';
-    });
+    }, state);
 
     patchedVirtualListCount++;
     return true;
   }
 
   function patchList(xd) {
-    if (!xd || typeof xd.updateDialog !== 'function' || !xd.sortedList || typeof xd.sortedList.update !== 'function') {
+    if (!xd || !xd.sortedList || typeof xd.sortedList.update !== 'function') {
       return false;
     }
 
@@ -131,10 +243,32 @@
     }
 
     let sortedList = xd.sortedList;
-    let state = {insideUpdateDialog: 0};
-    let originalUpdateDialog = xd.updateDialog;
-    let originalSortedUpdate = sortedList.update;
+    let state = {
+      listId: nextListId++,
+      filterId: xd.filterId === undefined ? null : xd.filterId,
+      insideUpdateDialog: 0
+    };
 
+    patchDialogListMethods(xd, state);
+    patchSortedListMethods(sortedList, state);
+    patchVirtualList(xd, state);
+
+    let originalSortedUpdate = sortedList.update;
+    let wrappedSortedUpdate = function() {
+      if (freezeEnabled && state.insideUpdateDialog > 0) {
+        suppressedSortUpdates++;
+        recordMutation('sortedList.update:suppressed', String(arguments[0]), state, 3);
+        return Promise.resolve();
+      }
+      if (diagnosticsEnabled && freezeEnabled) {
+        recordMutation('sortedList.update:allowed', String(arguments[0]), state, 3);
+      }
+      return originalSortedUpdate.apply(this, arguments);
+    };
+
+    addPatch(sortedList, 'update', originalSortedUpdate, wrappedSortedUpdate);
+
+    let originalUpdateDialog = xd.updateDialog;
     let wrappedUpdateDialog = function() {
       state.insideUpdateDialog++;
       try {
@@ -144,22 +278,10 @@
       }
     };
 
-    let wrappedSortedUpdate = function() {
-      if (freezeEnabled && state.insideUpdateDialog > 0) {
-        suppressedSortUpdates++;
-        return Promise.resolve();
-      }
-      return originalSortedUpdate.apply(this, arguments);
-    };
-
-    xd.updateDialog = wrappedUpdateDialog;
-    sortedList.update = wrappedSortedUpdate;
-    patchVirtualList(xd);
+    addPatch(xd, 'updateDialog', originalUpdateDialog, wrappedUpdateDialog);
     listStates.set(xd, state);
-
-    patches.push({target: xd, key: 'updateDialog', original: originalUpdateDialog, wrapped: wrappedUpdateDialog});
-    patches.push({target: sortedList, key: 'update', original: originalSortedUpdate, wrapped: wrappedSortedUpdate});
     patchedListCount++;
+    console.info('[TeleTether] 已接管清單', {listId: state.listId, filterId: state.filterId});
     return true;
   }
 
@@ -178,8 +300,7 @@
         return result;
       };
 
-      manager.l = wrappedFactory;
-      patches.push({target: manager, key: 'l', original: originalFactory, wrapped: wrappedFactory});
+      addPatch(manager, 'l', originalFactory, wrappedFactory);
     }
 
     if (manager.xds) {
@@ -204,8 +325,7 @@
 
   function setFrozen(enabled) {
     freezeEnabled = Boolean(enabled);
-    let message = freezeEnabled ? '已啟用：聊天項目排序凍結' : '已停用：恢復 Telegram 原生排序';
-    console.info('[TeleTether]', message);
+    console.info('[TeleTether]', freezeEnabled ? '已啟用：聊天項目排序凍結' : '已停用：恢復 Telegram 原生排序');
     return getStatus();
   }
 
@@ -221,12 +341,8 @@
     return getStatus();
   }
 
-  function stopDiagnostics() {
-    diagnosticsEnabled = false;
-    return reportDiagnostics();
-  }
-
   function reportDiagnostics() {
+    diagnosticsEnabled = false;
     let summary = Object.keys(diagnosticCounts).map(function(operation) {
       return {operation: operation, count: diagnosticCounts[operation]};
     });
@@ -237,12 +353,14 @@
       return {
         number: event.number,
         time: event.time,
+        listId: event.listId,
+        filterId: event.filterId,
         operation: event.operation,
-        detail: event.detail
+        detail: typeof event.detail === 'object' ? JSON.stringify(event.detail) : event.detail
       };
     }));
     diagnosticEvents.forEach(function(event) {
-      console.log('#' + event.number + ' ' + event.operation + ' ' + event.detail + '\n' + event.stack);
+      console.log('#' + event.number + ' [' + event.listId + '/' + event.filterId + '] ' + event.operation + ' ' + JSON.stringify(event.detail) + '\n' + event.stack);
     });
     console.groupEnd();
 
@@ -293,7 +411,7 @@
     toggle: toggleFreeze,
     status: getStatus,
     diagnostics: function(enabled) {
-      return enabled ? startDiagnostics() : stopDiagnostics();
+      return enabled ? startDiagnostics() : reportDiagnostics();
     },
     report: reportDiagnostics,
     clearDiagnostics: clearDiagnostics,
@@ -306,7 +424,7 @@
       console.table(getStatus());
     });
     GM_registerMenuCommand('TeleTether：開始更新路徑診斷', startDiagnostics);
-    GM_registerMenuCommand('TeleTether：輸出診斷報告', stopDiagnostics);
+    GM_registerMenuCommand('TeleTether：輸出診斷報告', reportDiagnostics);
     GM_registerMenuCommand('TeleTether：撤銷攔截', restore);
   }
 
