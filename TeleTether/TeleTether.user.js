@@ -7,6 +7,8 @@
 // @run-at       document-idle
 // @grant        unsafeWindow
 // @grant        GM_registerMenuCommand
+// @downloadURL  https://raw.githubusercontent.com/Mr-holysheep/storage/main/TeleTether/TeleTether.user.js
+// @updateURL    https://raw.githubusercontent.com/Mr-holysheep/storage/main/TeleTether/TeleTether.user.js
 // ==/UserScript==
 
 (function() {
