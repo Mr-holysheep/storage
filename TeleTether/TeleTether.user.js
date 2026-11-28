@@ -185,13 +185,15 @@
       let wrappedGetIndex = function() {
         let key = arguments[0];
         let result = originalGetIndex.apply(this, arguments);
-        if (result && typeof result.then === 'function') {
-          return result.then(function(index) {
-            recordMutation('sortedList.getIndexForKey:resolved', String(key) + ' -> ' + String(index), state, 3);
-            return index;
-          });
+        if (diagnosticsEnabled && freezeEnabled) {
+          if (result && typeof result.then === 'function') {
+            return result.then(function(index) {
+              recordMutation('sortedList.getIndexForKey:resolved', String(key) + ' -> ' + String(index), state, 3);
+              return index;
+            });
+          }
+          recordMutation('sortedList.getIndexForKey', String(key) + ' -> ' + String(result), state, 3);
         }
-        recordMutation('sortedList.getIndexForKey', String(key) + ' -> ' + String(result), state, 3);
         return result;
       };
 
@@ -233,7 +235,7 @@
   }
 
   function patchList(xd) {
-    if (!xd || !xd.sortedList || typeof xd.sortedList.update !== 'function') {
+    if (!xd || typeof xd.updateDialog !== 'function' || !xd.sortedList || typeof xd.sortedList.update !== 'function') {
       return false;
     }
 
