@@ -1,0 +1,431 @@
+userscript.html?name…fa-576a429377cb:235 [TeleTether] 清單更新診斷報告
+userscript.html?name…fa-576a429377cb:236 
+(索引)
+operation
+count
+0	'virtualList.removePinnedItem'	2
+1	'virtualList.removeItem'	2
+2	'virtualList.addItems'	3
+Array(3)
+0
+: 
+count
+: 
+2
+operation
+: 
+"virtualList.removePinnedItem"
+[[Prototype]]
+: 
+Object
+1
+: 
+count
+: 
+2
+operation
+: 
+"virtualList.removeItem"
+[[Prototype]]
+: 
+Object
+2
+: 
+count
+: 
+3
+operation
+: 
+"virtualList.addItems"
+[[Prototype]]
+: 
+Object
+length
+: 
+3
+[[Prototype]]
+: 
+Array(0)
+userscript.html?name…fa-576a429377cb:237 
+(索引)
+number
+time
+operation
+detail
+0	1	'下午7:41:40'	'virtualList.removePinnedItem'	'-1605873702'
+1	2	'下午7:41:40'	'virtualList.removeItem'	'-1605873702'
+2	3	'下午7:41:40'	'virtualList.addItems'	'-1605873702@117693872013507'
+3	4	'下午7:42:20'	'virtualList.removePinnedItem'	'-1804362044'
+4	5	'下午7:42:20'	'virtualList.removeItem'	'-1804362044'
+5	6	'下午7:42:20'	'virtualList.addItems'	'-1804362044@117693883285707'
+6	7	'下午7:42:20'	'virtualList.addItems'	'-1804362044@117693883285707'
+Array(7)
+0
+: 
+detail
+: 
+"-1605873702"
+number
+: 
+1
+operation
+: 
+"virtualList.removePinnedItem"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+1
+: 
+detail
+: 
+"-1605873702"
+number
+: 
+2
+operation
+: 
+"virtualList.removeItem"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+2
+: 
+detail
+: 
+"-1605873702@117693872013507"
+number
+: 
+3
+operation
+: 
+"virtualList.addItems"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+3
+: 
+detail
+: 
+"-1804362044"
+number
+: 
+4
+operation
+: 
+"virtualList.removePinnedItem"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+4
+: 
+detail
+: 
+"-1804362044"
+number
+: 
+5
+operation
+: 
+"virtualList.removeItem"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+5
+: 
+detail
+: 
+"-1804362044@117693883285707"
+number
+: 
+6
+operation
+: 
+"virtualList.addItems"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+6
+: 
+detail
+: 
+"-1804362044@117693883285707"
+number
+: 
+7
+operation
+: 
+"virtualList.addItems"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+length
+: 
+7
+[[Prototype]]
+: 
+Array(0)
+userscript.html?name…fa-576a429377cb:246 #1 virtualList.removePinnedItem -1605873702
+    at Object.wrapped [as removePinnedItem] (userscript.html?name…a-576a429377cb:82:9)
+    at sortedDialogList.ts:344:46
+    at H (solid.js:800:17)
+    at k (solid.js:444:10)
+    at Ij.delete (sortedDialogList.ts:336:5)
+    at KX.deleteDialogByKey (base.ts:137:21)
+    at KX.deleteDialog (base.ts:141:17)
+    at KX.addOrDeleteDialogIfNeeded (base.ts:149:12)
+    at KX.updateDialog (base.ts:164:13)
+userscript.html?name…fa-576a429377cb:246 #2 virtualList.removeItem -1605873702
+    at Object.wrapped [as removeItem] (userscript.html?name…a-576a429377cb:82:9)
+    at sortedDialogList.ts:345:44
+    at H (solid.js:800:17)
+    at k (solid.js:444:10)
+    at Ij.delete (sortedDialogList.ts:336:5)
+    at KX.deleteDialogByKey (base.ts:137:21)
+    at KX.deleteDialog (base.ts:141:17)
+    at KX.addOrDeleteDialogIfNeeded (base.ts:149:12)
+    at KX.updateDialog (base.ts:164:13)
+userscript.html?name…fa-576a429377cb:246 #3 virtualList.addItems -1605873702@117693872013507
+    at Object.wrapped [as addItems] (userscript.html?name…a-576a429377cb:82:9)
+    at Ij.add (sortedDialogList.ts:313:22)
+userscript.html?name…fa-576a429377cb:246 #4 virtualList.removePinnedItem -1804362044
+    at Object.wrapped [as removePinnedItem] (userscript.html?name…a-576a429377cb:82:9)
+    at sortedDialogList.ts:344:46
+    at H (solid.js:800:17)
+    at k (solid.js:444:10)
+    at Ij.delete (sortedDialogList.ts:336:5)
+    at KX.deleteDialogByKey (base.ts:137:21)
+    at KX.deleteDialog (base.ts:141:17)
+    at KX.addOrDeleteDialogIfNeeded (base.ts:149:12)
+    at KX.updateDialog (base.ts:164:13)
+userscript.html?name…fa-576a429377cb:246 #5 virtualList.removeItem -1804362044
+    at Object.wrapped [as removeItem] (userscript.html?name…a-576a429377cb:82:9)
+    at sortedDialogList.ts:345:44
+    at H (solid.js:800:17)
+    at k (solid.js:444:10)
+    at Ij.delete (sortedDialogList.ts:336:5)
+    at KX.deleteDialogByKey (base.ts:137:21)
+    at KX.deleteDialog (base.ts:141:17)
+    at KX.addOrDeleteDialogIfNeeded (base.ts:149:12)
+    at KX.updateDialog (base.ts:164:13)
+userscript.html?name…fa-576a429377cb:246 #6 virtualList.addItems -1804362044@117693883285707
+    at Object.wrapped [as addItems] (userscript.html?name…a-576a429377cb:82:9)
+    at Ij.add (sortedDialogList.ts:313:22)
+userscript.html?name…fa-576a429377cb:246 #7 virtualList.addItems -1804362044@117693883285707
+    at Object.wrapped [as addItems] (userscript.html?name…a-576a429377cb:82:9)
+    at Ij.add (sortedDialogList.ts:313:22)
+{counts: Array(3), events: Array(7)}
+counts
+: 
+Array(3)
+0
+: 
+count
+: 
+2
+operation
+: 
+"virtualList.removePinnedItem"
+[[Prototype]]
+: 
+Object
+1
+: 
+count
+: 
+2
+operation
+: 
+"virtualList.removeItem"
+[[Prototype]]
+: 
+Object
+2
+: 
+count
+: 
+3
+operation
+: 
+"virtualList.addItems"
+[[Prototype]]
+: 
+Object
+length
+: 
+3
+[[Prototype]]
+: 
+Array(0)
+events
+: 
+Array(7)
+0
+: 
+detail
+: 
+"-1605873702"
+number
+: 
+1
+operation
+: 
+"virtualList.removePinnedItem"
+stack
+: 
+"    at Object.wrapped [as removePinnedItem] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88225\n    at H (https://web.telegram.org/k/solid-B0Du5GQu.js:2:7611)\n    at k (https://web.telegram.org/k/solid-B0Du5GQu.js:2:3626)\n    at Ij.delete (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88194)\n    at KX.deleteDialogByKey (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2735)\n    at KX.deleteDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2767)\n    at KX.addOrDeleteDialogIfNeeded (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2928)\n    at KX.updateDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2999)"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+1
+: 
+detail
+: 
+"-1605873702"
+number
+: 
+2
+operation
+: 
+"virtualList.removeItem"
+stack
+: 
+"    at Object.wrapped [as removeItem] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88264\n    at H (https://web.telegram.org/k/solid-B0Du5GQu.js:2:7611)\n    at k (https://web.telegram.org/k/solid-B0Du5GQu.js:2:3626)\n    at Ij.delete (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88194)\n    at KX.deleteDialogByKey (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2735)\n    at KX.deleteDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2767)\n    at KX.addOrDeleteDialogIfNeeded (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2928)\n    at KX.updateDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2999)"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+2
+: 
+detail
+: 
+"-1605873702@117693872013507"
+number
+: 
+3
+operation
+: 
+"virtualList.addItems"
+stack
+: 
+"    at Object.wrapped [as addItems] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at Ij.add (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:87862)"
+time
+: 
+"下午7:41:40"
+[[Prototype]]
+: 
+Object
+3
+: 
+detail
+: 
+"-1804362044"
+number
+: 
+4
+operation
+: 
+"virtualList.removePinnedItem"
+stack
+: 
+"    at Object.wrapped [as removePinnedItem] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88225\n    at H (https://web.telegram.org/k/solid-B0Du5GQu.js:2:7611)\n    at k (https://web.telegram.org/k/solid-B0Du5GQu.js:2:3626)\n    at Ij.delete (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88194)\n    at KX.deleteDialogByKey (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2735)\n    at KX.deleteDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2767)\n    at KX.addOrDeleteDialogIfNeeded (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2928)\n    at KX.updateDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2999)"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+4
+: 
+detail
+: 
+"-1804362044"
+number
+: 
+5
+operation
+: 
+"virtualList.removeItem"
+stack
+: 
+"    at Object.wrapped [as removeItem] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88264\n    at H (https://web.telegram.org/k/solid-B0Du5GQu.js:2:7611)\n    at k (https://web.telegram.org/k/solid-B0Du5GQu.js:2:3626)\n    at Ij.delete (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:88194)\n    at KX.deleteDialogByKey (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2735)\n    at KX.deleteDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2767)\n    at KX.addOrDeleteDialogIfNeeded (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2928)\n    at KX.updateDialog (https://web.telegram.org/k/handleTabSwipe-Dn1izdvn.js:2:2999)"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+5
+: 
+detail
+: 
+"-1804362044@117693883285707"
+number
+: 
+6
+operation
+: 
+"virtualList.addItems"
+stack
+: 
+"    at Object.wrapped [as addItems] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at Ij.add (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:87862)"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+6
+: 
+detail
+: 
+"-1804362044@117693883285707"
+number
+: 
+7
+operation
+: 
+"virtualList.addItems"
+stack
+: 
+"    at Object.wrapped [as addItems] (chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/userscript.html?name=TeleTether.user.js&id=d6471e9a-927f-43a1-98fa-576a429377cb:82:9)\n    at Ij.add (https://web.telegram.org/k/appDialogsManager-3veEpXl0.js:4:87862)"
+time
+: 
+"下午7:42:20"
+[[Prototype]]
+: 
+Object
+length
+: 
+7
+[[Prototype]]
+: 
+Array(0)
+[[Prototype]]
+: 
+Object
